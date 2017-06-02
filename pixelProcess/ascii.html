@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Title</title>
+</head>
+<style type='text/css'>
+    body{
+        line-height: 10px;
+        font-size: 12px;
+        letter-spacing: -0.5px;
+        text-align:justify;
+    }
+</style>
+<body>
+
+<canvas id='canvas'></canvas>
+<script>
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    canvas.width = 150;
+    canvas.height = 200;
+    var img = new Image();
+    img.src = './wolf.jpg';
+    img.onload =function(){
+        invert(this);
+    };
+
+    function invert(img) {
+        context.drawImage(img,0,0);
+        //获取图片对象以及元素点的数组
+        var img1 = context.getImageData(0, 20, 150, 200);
+        var data = img1.data;
+        //转换灰度图
+//        var arr=['M','N','H','Q','$','O','C','、','《','》','！','：','–','；','。'];
+        var arr=["M","N","H","Q","$","O","@","？","、","》","！","：","-","；","。"];
+        var result=[];
+        for (var i = 0, len = data.length; i < len; i += 4) {
+            var avg=(data[i]);
+            var num=Math.floor(avg/18);
+            result.push(arr[num]);
+            if(i%600==0&&i!=0){
+                result.push('<br>')
+            }
+        }
+
+        var opt = document.createElement('div');
+
+        opt.innerHTML=result.join('');
+        document.body.appendChild(opt);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>canvas</title>
+</head>
+<body>
+<h1>bigger</h1>
+<canvas  id="canvas1" width="200" height="200"></canvas>
+<!--当浏览器不支持html5时，会显示连接提示下载firefox-->
+<script>
+    let canvas1=document.getElementById('canvas1');
+    let context1=canvas1.getContext('2d');
+    image=new Image();
+    image.src="./cake.jpg";
+    let imagedata1;
+    let imagedata2;
+    setTimeout(()=>{
+        context1.drawImage(image,0,0);//绘制原始图像，（0,0）表示图像的左上角位与canvas画布的位置
+        imagedata1=context1.getImageData(0,0,image.width,image.height);
+        imagedata2=context1.createImageData(image.width,image.height);
+    },0);
+
+    r=40;//放大镜半径
+
+
+    canvas1.onmousemove=function(e){
+        let x=e.clientX-e.target.offsetLeft;
+        let y=e.clientY-e.target.offsetTop;
+        x0=x;y0=y;//当前点到初始点的距离
+        for (let j=0;j<image.height;j++){
+            for(let i=0;i<image.width;i++){
+                let k=4*(image.width*j+i);//从上到下，从左到右数第几个像素点
+                let k1=4*(image.width*Math.floor((j+y0)/2)+Math.floor((i+x0)/2));//对应的原始图像上的点
+                if (isOn(x0,y0,i,j,r)){//放大镜边缘上的点
+                    imagedata2.data[k+0]=0;
+                    imagedata2.data[k+1]=0;
+                    imagedata2.data[k+2]=0;
+                    imagedata2.data[k+3]=0;
+                }
+                else if(isIn(x0,y0,i,j,r)){//放大区域的点
+                    if(k1>=0&&k1<=4*image.height*image.width){//放大效果的的时候，这一步其实可以省略
+                        imagedata2.data[k+0]=imagedata1.data[k1+0];
+                        imagedata2.data[k+1]=imagedata1.data[k1+1];
+                        imagedata2.data[k+2]=imagedata1.data[k1+2];
+                        imagedata2.data[k+3]=255;
+
+                    }
+                }
+                else{//其他剩下不受影响的点
+                    imagedata2.data[k+0]=imagedata1.data[k+0];
+                    imagedata2.data[k+1]=imagedata1.data[k+1];
+                    imagedata2.data[k+2]=imagedata1.data[k+2];
+                    imagedata2.data[k+3]=255;
+                }
+            }}
+        context1.putImageData(imagedata2,0,0);//canvas显示
+    }
+    canvas1.onmouseout=function(){context1.drawImage(image,0,0);}//鼠标移出，自动重绘
+    function isIn(x0,y0,x,y,r){//放大区域
+        if((x0-x)*(x0-x)+(y0-y)*(y0-y)<r*r)
+            return true;
+        else
+            return false;
+    }
+    function isOn(x0,y0,x,y,r){//放大镜边缘
+        if((x0-x)*(x0-x)+(y0-y)*(y0-y)==r*r)
+            return true;
+        else
+            return false;
+    }
+</script>
+<br/>
+
+</body>
+</html>
